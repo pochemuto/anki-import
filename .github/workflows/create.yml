@@ -77,9 +77,8 @@ jobs:
         files: |
           *.apkg
     - name: Upload to Dropbox
-      uses: ./ # Uses an action in the root directory
+      uses: whalemare/action-dropbox@v1.0.0
       with:
-        DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-        DROPBOX_DESTINATION_PATH_PREFIX: "/Документы/Billingua/"
-        GLOB: "*.apkg"
-        DEBUG: false
+        accessToken: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+        destination: "/Документы/Billingua/"
+        file: german.apkg
