@@ -26,19 +26,22 @@ requests = {version = "*", extras = ["socks"]}
 
 [[package]]
 name = "beautifulsoup4"
-version = "4.12.2"
+version = "4.12.3"
 description = "Screen-scraping library"
 optional = false
 python-versions = ">=3.6.0"
 files = [
-    {file = "beautifulsoup4-4.12.2-py3-none-any.whl", hash = "sha256:bd2520ca0d9d7d12694a53d44ac482d181b4ec1888909b035a3dbf40d0f57d4a"},
-    {file = "beautifulsoup4-4.12.2.tar.gz", hash = "sha256:492bbc69dca35d12daac71c4db1bfff0c876c00ef4a2ffacce226d4638eb72da"},
+    {file = "beautifulsoup4-4.12.3-py3-none-any.whl", hash = "sha256:b80878c9f40111313e55da8ba20bdba06d8fa3969fc68304167741bbf9e082ed"},
+    {file = "beautifulsoup4-4.12.3.tar.gz", hash = "sha256:74e3d1928edc070d21748185c46e3fb33490f22f52a3addee9aee0f4f7781051"},
 ]
 
 [package.dependencies]
 soupsieve = ">1.2"
 
 [package.extras]
+cchardet = ["cchardet"]
+chardet = ["chardet"]
+charset-normalizer = ["charset-normalizer"]
 html5lib = ["html5lib"]
 lxml = ["lxml"]
 
@@ -522,6 +525,31 @@ files = [
 ]
 
 [[package]]
+name = "types-beautifulsoup4"
+version = "4.12.0.20240106"
+description = "Typing stubs for beautifulsoup4"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-beautifulsoup4-4.12.0.20240106.tar.gz", hash = "sha256:98d628985b71b140bd3bc22a8cb0ab603c2f2d08f20d37925965eb4a21739be8"},
+    {file = "types_beautifulsoup4-4.12.0.20240106-py3-none-any.whl", hash = "sha256:cbdd60ab8aeac737ac014431b6e921b43e84279c0405fdd25a6900bb0e71da5b"},
+]
+
+[package.dependencies]
+types-html5lib = "*"
+
+[[package]]
+name = "types-html5lib"
+version = "1.1.11.20240106"
+description = "Typing stubs for html5lib"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-html5lib-1.1.11.20240106.tar.gz", hash = "sha256:fc3a1b18eb601b3eeaf92c900bd67675c0a4fa1dd1d2a2893ebdb46923547ee9"},
+    {file = "types_html5lib-1.1.11.20240106-py3-none-any.whl", hash = "sha256:61993cb89220107481e0f1da65c388ff8cf3d8c5f6e8483c97559639a596b697"},
+]
+
+[[package]]
 name = "urllib3"
 version = "2.1.0"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -554,4 +582,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5d01b0caa74dedf0508b369b087061ffbd2759e22744f47864ea280373f5027d"
+content-hash = "f31e573f3e1855044e97ba353c1b8ddecd1e87c7f672d1b6eae4818108ef08f3"

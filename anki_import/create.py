@@ -3,12 +3,15 @@ import json
 import os
 from pprint import pprint
 import re
+from typing import cast
 import anki
 import gspread
 from anki.collection import Collection
 from anki.exporting import AnkiPackageExporter
 from loguru import logger
 import csv
+import os
+from bs4 import BeautifulSoup, element
 
 article_template = re.compile(r"^(der|die|das|[esr]) ")
 plurals = re.compile(r",\s+.*$")
@@ -84,7 +87,44 @@ def replace_article(string):
     )
 
 
-def create_deck(cards: list[Card]):
+@dataclass
+class Template:
+    name: str
+    question: str
+    answer: str
+
+
+@dataclass
+class Templates:
+    css: str
+    templates: dict[str, Template]
+
+
+def parse_template(tag: element.Tag) -> Template:
+    return Template(
+        name=cast(str, tag.get("data-name")),
+        question=cast(element.Tag, tag.find(class_="question")).prettify(),
+        answer=cast(element.Tag, tag.find(class_="answer")).prettify(),
+    )
+
+
+def read_templates() -> Templates:
+    script_path = os.path.abspath(__file__)
+    templates_path = os.path.join(os.path.dirname(script_path), "templates.html")
+    with open(templates_path, "r", encoding="utf-8") as file:
+        html_content = file.read()
+    soup = BeautifulSoup(html_content, "html.parser")
+    css = soup.find(id="css")
+    assert css is not None
+
+    templates: dict[str, Template] = {}
+    for template_tag in soup.find_all(class_="template"):
+        template = parse_template(template_tag)
+        templates[template.name] = template
+    return Templates(css=css.text, templates=templates)
+
+
+def create_deck(cards: list[Card], templates: Templates):
     logger.info("Creating deck")
 
     # Create a new collection
@@ -97,24 +137,7 @@ def create_deck(cards: list[Card]):
 
     model = collection.models.new("German Russian Cards")
     model["did"] = deck_id
-    model[
-        "css"
-    ] = """
-  .card {
-    font-family: arial;
-    font-size: 20px;
-    text-align: center;
-    color: black;
-    background-color: white;
-  }
-  .from {
-    font-style: italic;
-  }
-  .de_example {
-    font-size: 15px;
-    color: gray
-  }
-  """
+    model["css"] = templates.css
 
     collection.models.addField(model, collection.models.new_field("De"))
     collection.models.addField(model, collection.models.new_field("DeExample"))
@@ -122,14 +145,13 @@ def create_deck(cards: list[Card]):
     collection.models.addField(model, collection.models.new_field("RuExample"))
 
     tmpl = collection.models.new_template("de -> ru")
-    tmpl[
-        "qfmt"
-    ] = '<div class="from">{{De}}<div class="de_example">{{DeExample}}</div></div>'
-    tmpl["afmt"] = "{{FrontSide}}\n\n<hr id=answer>\n\n{{Ru}}"
+    tmpl["qfmt"] = templates.templates["de2ru"].question
+    tmpl["afmt"] = templates.templates["de2ru"].answer
+
     collection.models.addTemplate(model, tmpl)
     tmpl = collection.models.new_template("ru -> de")
-    tmpl["qfmt"] = "{{Ru}}"
-    tmpl["afmt"] = '{{FrontSide}}\n\n<hr id=answer>\n\n<div class="from">{{De}}</div>'
+    tmpl["qfmt"] = templates.templates["ru2de"].question
+    tmpl["afmt"] = templates.templates["ru2de"].answer
     collection.models.addTemplate(model, tmpl)
 
     model["id"] = 3371927463  # essential for upgrade detection
@@ -156,7 +178,8 @@ def create_deck(cards: list[Card]):
 def main():
     logger.info("Creating apkg...")
     cards = read_spreadsheet()
-    create_deck(cards)
+    templates = read_templates()
+    create_deck(cards, templates)
     logger.info("Done.")
 
 

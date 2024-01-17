@@ -1,0 +1,82 @@
+<style>
+    .question,
+    .answer {
+        border-color: black;
+        border-width: 1px;
+        border-style: solid;
+        min-height: 250px;
+        min-width: 200px;
+        margin-bottom: 10px;
+    }
+
+    .template::before {
+	    content: attr(data-name);
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    }
+</style>
+<style id="css">
+    .card {
+        font-family: arial;
+        font-size: 20px;
+        text-align: center;
+        color: black;
+        background-color: rgb(141, 224, 241);
+    }
+
+    #answer {
+        background-color: white;
+    }
+
+    .from {
+        background-color: #18adab;
+        border-radius: 7px;
+        color: #fff;
+        padding: 20px;
+        font-size: 30px;
+        text-align: center;
+        margin: 40px 20px;
+    }
+
+    .from.answered {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        margin-bottom: 0;
+    }
+
+    #answer {
+        border-radius: 0px 0px 7px 7px;
+        margin-left: 20px;
+        margin-right: 20px;
+        padding: 20px;
+    }
+
+    .example {
+        font-size: 15px;
+        margin-top: 10px;
+        color: rgb(230, 230, 230);
+    }
+</style>
+
+<div class="template" data-name="de2ru">
+    <div class="question card">
+        <div class="from">{{tts de_DE:De}}<div class="example">{{DeExample}}</div>
+        </div>
+    </div>
+
+    <div class="answer card">
+        <div class="from answered">{{tts de_DE:De}}<div class="example">{{DeExample}}</div>
+        </div>
+        <div id="answer">{{Ru}}</div>
+    </div>
+</div>
+
+<div class="template" data-name="ru2de">
+    <div class="question card">
+        <div class="from">{{Ru}}</div>
+    </div>
+
+    <div class="answer card">
+        <div class="from answered">{{Ru}}</div>
+        <div id="answer">{{De}}</div>
+    </div>
+</div>
