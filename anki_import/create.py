@@ -147,12 +147,12 @@ def create_deck(cards: list[Card], templates: Templates):
     tmpl = collection.models.new_template("de -> ru")
     tmpl["qfmt"] = templates.templates["de2ru"].question
     tmpl["afmt"] = templates.templates["de2ru"].answer
+    collection.models.add_template(model, tmpl)
 
-    collection.models.addTemplate(model, tmpl)
     tmpl = collection.models.new_template("ru -> de")
     tmpl["qfmt"] = templates.templates["ru2de"].question
     tmpl["afmt"] = templates.templates["ru2de"].answer
-    collection.models.addTemplate(model, tmpl)
+    collection.models.add_template(model, tmpl)
 
     model["id"] = 3371927463  # essential for upgrade detection
     collection.models.update(model)
