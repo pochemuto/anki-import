@@ -47,7 +47,13 @@ def read_csv() -> list[Card]:
 def read_spreadsheet() -> list[Card]:
     sh_key = '1IMquarJDdEsJUSYFOHIz_xRK4c-OGVR9Geqf5CH4ZjM'
     logger.info("Reading spreadsheet https://docs.google.com/spreadsheets/d/" + sh_key)
-    gc = gspread.service_account()
+    auth = os.getenv("GOOGLE_SERVICE_ACCOUNT")
+    if auth:
+        logger.info("Found auth info in env")
+        gc = gspread.service_account_from_dict(auth)
+    else:
+        logger.info("Auth not found in env, using default")
+        gc = gspread.service_account()
     sh = gc.open_by_key(sh_key)
     worksheet = sh.sheet1
     data_list = []
@@ -76,7 +82,7 @@ def replace_article(string):
 
 
 def create_deck(cards: list[Card]):
-    # from anki.importing.csvfile import TextImporter
+    logger.info("Creating deck")
 
     # Create a new collection
     collection = Collection("collection.anki2")
@@ -139,7 +145,9 @@ def create_deck(cards: list[Card]):
         collection.addNote(note)
 
     exporter = AnkiPackageExporter(collection)
-    exporter.exportInto("german.apkg")
+    export_path = os.path.abspath("german.apkg")
+    exporter.exportInto(export_path)
+    logger.info("Saved to {}", export_path)
 
 
 
@@ -148,3 +156,6 @@ def main():
     cards = read_spreadsheet()
     create_deck(cards)
     logger.info("Done.")
+
+if __name__ == '__main__':
+    main()
