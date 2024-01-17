@@ -45,8 +45,9 @@ def read_csv() -> list[Card]:
 
     return data_list
 
+
 def read_spreadsheet() -> list[Card]:
-    sh_key = '1IMquarJDdEsJUSYFOHIz_xRK4c-OGVR9Geqf5CH4ZjM'
+    sh_key = "1IMquarJDdEsJUSYFOHIz_xRK4c-OGVR9Geqf5CH4ZjM"
     logger.info("Reading spreadsheet https://docs.google.com/spreadsheets/d/" + sh_key)
     auth = os.getenv("GOOGLE_SERVICE_ACCOUNT")
     if auth:
@@ -69,6 +70,7 @@ def read_spreadsheet() -> list[Card]:
         )
         data_list.append(data_obj)
     return data_list
+
 
 def replace_article(string):
     pattern = re.compile(r"^(der|die|das)\s")
@@ -108,26 +110,26 @@ def create_deck(cards: list[Card]):
   .from {
     font-style: italic;
   }
-  .example_de {
+  .de_example {
     font-size: 15px;
     color: gray
   }
   """
 
-    collection.models.addField(model, collection.models.new_field("de"))
-    collection.models.addField(model, collection.models.new_field("example_de"))
-    collection.models.addField(model, collection.models.new_field("ru"))
-    collection.models.addField(model, collection.models.new_field("example_ru"))
+    collection.models.addField(model, collection.models.new_field("De"))
+    collection.models.addField(model, collection.models.new_field("DeExample"))
+    collection.models.addField(model, collection.models.new_field("Ru"))
+    collection.models.addField(model, collection.models.new_field("RuExample"))
 
     tmpl = collection.models.new_template("de -> ru")
     tmpl[
         "qfmt"
-    ] = '<div class="from">{{de}}<div class="example_de">{{example_de}}</div></div>'
-    tmpl["afmt"] = "{{FrontSide}}\n\n<hr id=answer>\n\n{{ru}}"
+    ] = '<div class="from">{{De}}<div class="de_example">{{DeExample}}</div></div>'
+    tmpl["afmt"] = "{{FrontSide}}\n\n<hr id=answer>\n\n{{Ru}}"
     collection.models.addTemplate(model, tmpl)
     tmpl = collection.models.new_template("ru -> de")
-    tmpl["qfmt"] = "{{ru}}"
-    tmpl["afmt"] = '{{FrontSide}}\n\n<hr id=answer>\n\n<div class="from">{{de}}</div>'
+    tmpl["qfmt"] = "{{Ru}}"
+    tmpl["afmt"] = '{{FrontSide}}\n\n<hr id=answer>\n\n<div class="from">{{De}}</div>'
     collection.models.addTemplate(model, tmpl)
 
     model["id"] = 3371927463  # essential for upgrade detection
@@ -137,10 +139,10 @@ def create_deck(cards: list[Card]):
 
     for card in cards:
         note = anki.notes.Note(collection, model)
-        note["de"] = replace_article(card.de)
-        note["ru"] = card.ru
-        note["example_de"] = card.beispiel
-        note["example_ru"] = card.example_ru
+        note["De"] = replace_article(card.de)
+        note["DeExample"] = card.beispiel
+        note["Ru"] = card.ru
+        note["RuExample"] = card.example_ru
 
         note.guid = card.uuid()
         collection.addNote(note)
@@ -151,12 +153,12 @@ def create_deck(cards: list[Card]):
     logger.info("Saved to {}", export_path)
 
 
-
 def main():
     logger.info("Creating apkg...")
     cards = read_spreadsheet()
     create_deck(cards)
     logger.info("Done.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
