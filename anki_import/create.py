@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import json
 import os
 from pprint import pprint
 import re
@@ -50,7 +51,7 @@ def read_spreadsheet() -> list[Card]:
     auth = os.getenv("GOOGLE_SERVICE_ACCOUNT")
     if auth:
         logger.info("Found auth info in env")
-        gc = gspread.service_account_from_dict(auth)
+        gc = gspread.service_account_from_dict(json.loads(auth))
     else:
         logger.info("Auth not found in env, using default")
         gc = gspread.service_account()
