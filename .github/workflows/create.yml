@@ -53,4 +53,6 @@ jobs:
     # run poetry script
     #----------------------------------------------
     - name: Test with pytest
+      env:
+        GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
       run: poetry run create
