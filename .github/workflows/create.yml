@@ -76,9 +76,3 @@ jobs:
         tag_name: ${{ steps.tag.outputs.tag }}
         files: |
           *.apkg
-    - name: Upload to Dropbox
-      uses: whalemare/action-dropbox@v1.0.0
-      with:
-        accessToken: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-        destination: "/Документы/Billingua/german.apkg"
-        file: german.apkg
