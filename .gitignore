@@ -3,6 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Anki
+*.apkg
+*.anki2
+*.anki2-wal
+collection.media/
+
+
 # C extensions
 *.so
 
