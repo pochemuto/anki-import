@@ -10,7 +10,7 @@
     }
 
     .template::before {
-	    content: attr(data-name);
+        content: attr(data-name);
         font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     }
 </style>
@@ -55,11 +55,26 @@
         margin-top: 10px;
         color: rgb(230, 230, 230);
     }
+
+    .tts {
+        display: inline;
+        position: absolute;
+    }
+
+    .replay-button:after {
+        content: "▶";
+    }
+
+    .replay-button svg {
+        display: none;
+    }
+
 </style>
 
 <div class="template" data-name="de2ru">
     <div class="question card">
-        <div class="from">{{De}}{{tts de_DE:De}}<div class="example">{{DeExample}}</div>
+        <div class="from">{{De}}<div class="tts">{{tts de_DE:De}}</div>
+            <div class="example">{{DeExample}}</div>
         </div>
     </div>
 
