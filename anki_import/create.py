@@ -142,7 +142,9 @@ def create_deck(cards: list[Card]):
     exporter.exportInto("german.apkg")
 
 
-logger.info("Exporting...")
-cards = read_spreadsheet()
-create_deck(cards)
-logger.info("Done.")
+
+def main():
+    logger.info("Creating apkg...")
+    cards = read_spreadsheet()
+    create_deck(cards)
+    logger.info("Done.")
