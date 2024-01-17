@@ -52,7 +52,14 @@ jobs:
     #----------------------------------------------
     # run poetry script
     #----------------------------------------------
-    - name: Test with pytest
+    - name: Create apkg
       env:
         GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
       run: poetry run create
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: false
+        files: |
+          *.apkg
