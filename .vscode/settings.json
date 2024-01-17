@@ -3,7 +3,9 @@
         "afmt",
         "anki",
         "beispiel",
+        "gspread",
         "Lernwortschatz",
+        "loguru",
         "qfmt"
     ]
 }

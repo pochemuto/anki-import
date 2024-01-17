@@ -3,6 +3,7 @@ import os
 from pprint import pprint
 import re
 import anki
+import gspread
 from anki.collection import Collection
 from anki.exporting import AnkiPackageExporter
 from loguru import logger
@@ -43,6 +44,24 @@ def read_csv() -> list[Card]:
 
     return data_list
 
+def read_spreadsheet() -> list[Card]:
+    sh_key = '1IMquarJDdEsJUSYFOHIz_xRK4c-OGVR9Geqf5CH4ZjM'
+    logger.info("Reading spreadsheet https://docs.google.com/spreadsheets/d/" + sh_key)
+    gc = gspread.service_account()
+    sh = gc.open_by_key(sh_key)
+    worksheet = sh.sheet1
+    data_list = []
+    records = worksheet.get_all_records()
+    logger.info("Read {} records, last: {}", len(records), records[-1])
+    for row in records:
+        data_obj = Card(
+            de=row["DE"],
+            ru=row["RU"],
+            beispiel=row["Beispiel"],
+            example_ru=row["Example"],
+        )
+        data_list.append(data_obj)
+    return data_list
 
 def replace_article(string):
     pattern = re.compile(r"^(der|die|das)\s")
@@ -124,7 +143,6 @@ def create_deck(cards: list[Card]):
 
 
 logger.info("Exporting...")
-os.chdir('/workspaces/anki-import')
-cards = read_csv()
+cards = read_spreadsheet()
 create_deck(cards)
 logger.info("Done.")
