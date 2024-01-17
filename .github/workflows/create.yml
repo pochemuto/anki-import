@@ -80,5 +80,5 @@ jobs:
       uses: whalemare/action-dropbox@v1.0.0
       with:
         accessToken: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-        destination: "/Документы/Billingua/"
+        destination: "/Документы/Billingua"
         file: german.apkg
