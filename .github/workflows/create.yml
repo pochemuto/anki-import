@@ -76,3 +76,10 @@ jobs:
         tag_name: ${{ steps.tag.outputs.tag }}
         files: |
           *.apkg
+    - name: Upload to Dropbox
+      uses: ./ # Uses an action in the root directory
+      with:
+        DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+        DROPBOX_DESTINATION_PATH_PREFIX: "/Документы/Billingua/"
+        GLOB: "*.apkg"
+        DEBUG: false
