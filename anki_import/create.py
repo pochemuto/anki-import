@@ -1,17 +1,14 @@
+from bs4 import BeautifulSoup, element
 from dataclasses import dataclass
+from loguru import logger
+from pprint import pprint
+from typing import cast
+import csv
+import genanki
+import gspread
 import json
 import os
-from pprint import pprint
 import re
-from typing import cast
-import anki
-import gspread
-from anki.collection import Collection
-from anki.exporting import AnkiPackageExporter
-from loguru import logger
-import csv
-import os
-from bs4 import BeautifulSoup, element
 
 article_template = re.compile(r"^(der|die|das|[esr]) ")
 plurals = re.compile(r",\s+.*$")
@@ -78,11 +75,11 @@ def read_spreadsheet() -> list[Card]:
 def replace_article(string):
     pattern = re.compile(r"^(der|die|das)\s")
     return pattern.sub(
-        lambda match: "r "
-        if match.group(1) == "der"
-        else "e "
-        if match.group(1) == "die"
-        else "s ",
+        lambda match: (
+            "r "
+            if match.group(1) == "der"
+            else "e " if match.group(1) == "die" else "s "
+        ),
         string,
     )
 
@@ -127,51 +124,55 @@ def read_templates() -> Templates:
 def create_deck(cards: list[Card], templates: Templates):
     logger.info("Creating deck")
 
-    # Create a new collection
-    collection = Collection("collection.anki2")
+    class GermanNote(genanki.Note):
+        @property
+        def guid(self):
+            return self._card.uuid()
 
-    # Save and export the collection to an Anki package (.apkg) file
-    deck_id = collection.decks.id("German")
-    assert deck_id is not None
-    deck = collection.decks.get(deck_id)
+        @property
+        def card(self) -> Card:
+            return self._card
 
-    model = collection.models.new("German Russian Cards")
-    model["did"] = deck_id
-    model["css"] = templates.css
+        @card.setter
+        def card(self, card: Card):
+            self._card = card
 
-    collection.models.addField(model, collection.models.new_field("De"))
-    collection.models.addField(model, collection.models.new_field("DeExample"))
-    collection.models.addField(model, collection.models.new_field("Ru"))
-    collection.models.addField(model, collection.models.new_field("RuExample"))
-
-    tmpl = collection.models.new_template("de -> ru")
-    tmpl["qfmt"] = templates.templates["de2ru"].question
-    tmpl["afmt"] = templates.templates["de2ru"].answer
-    collection.models.add_template(model, tmpl)
-
-    tmpl = collection.models.new_template("ru -> de")
-    tmpl["qfmt"] = templates.templates["ru2de"].question
-    tmpl["afmt"] = templates.templates["ru2de"].answer
-    collection.models.add_template(model, tmpl)
-
-    model["id"] = 3371927463  # essential for upgrade detection
-    collection.models.update(model)
-    collection.models.set_current(model)
-    collection.models.save(model)
+    deck = genanki.Deck(42223151, "German")
+    model = genanki.Model(
+        3371927463,
+        "German Russian Cards",
+        fields=[
+            {"name": "De"},
+            {"name": "DeExample"},
+            {"name": "Ru"},
+            {"name": "RuExample"},
+        ],
+        css=templates.css,
+        templates=[
+            {
+                "name": "de -> ru",
+                "qfmt": templates.templates["de2ru"].question,
+                "afmt": templates.templates["de2ru"].answer,
+            },
+            {
+                "name": "ru -> de",
+                "qfmt": templates.templates["ru2de"].question,
+                "afmt": templates.templates["ru2de"].answer,
+            },
+        ],
+    )
+    deck.add_model(model)
 
     for card in cards:
-        note = anki.notes.Note(collection, model)
-        note["De"] = replace_article(card.de)
-        note["DeExample"] = card.beispiel
-        note["Ru"] = card.ru
-        note["RuExample"] = card.example_ru
+        note = GermanNote(
+            model=model,
+            fields=[replace_article(card.de), card.beispiel, card.ru, card.example_ru],
+        )
+        note.card = card
+        deck.add_note(note)
 
-        note.guid = card.uuid()
-        collection.addNote(note)
-
-    exporter = AnkiPackageExporter(collection)
     export_path = os.path.abspath("german.apkg")
-    exporter.exportInto(export_path)
+    genanki.Package(deck).write_to_file(export_path)
     logger.info("Saved to {}", export_path)
 
 
