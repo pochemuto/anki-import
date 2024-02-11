@@ -14,6 +14,18 @@ article_template = re.compile(r"^(der|die|das|[esr]) ")
 plurals = re.compile(r",\s+.*$")
 
 
+def expand_article(string):
+    pattern = re.compile(r"^(r|e|s)\s")
+    return pattern.sub(
+        lambda match: (
+            "der "
+            if match.group(1) == "d"
+            else "die " if match.group(1) == "e" else "das "
+        ),
+        string,
+    )
+
+
 @dataclass
 class Card:
     ru: str
@@ -21,11 +33,16 @@ class Card:
     beispiel: str
     example_ru: str
 
+    @property
     def uuid(self) -> str:
         uuid = self.de
         uuid = re.sub(article_template, "", uuid)
         uuid = re.sub(plurals, "", uuid)
         return uuid
+
+    @property
+    def de_speak(self) -> str:
+        return expand_article(re.sub(plurals, "", self.de))
 
 
 def read_csv() -> list[Card]:
@@ -72,18 +89,6 @@ def read_spreadsheet() -> list[Card]:
     return data_list
 
 
-def replace_article(string):
-    pattern = re.compile(r"^(der|die|das)\s")
-    return pattern.sub(
-        lambda match: (
-            "r "
-            if match.group(1) == "der"
-            else "e " if match.group(1) == "die" else "s "
-        ),
-        string,
-    )
-
-
 @dataclass
 class Template:
     name: str
@@ -127,7 +132,7 @@ def create_deck(cards: list[Card], templates: Templates):
     class GermanNote(genanki.Note):
         @property
         def guid(self):
-            return self._card.uuid()
+            return self._card.uuid
 
         @property
         def card(self) -> Card:
@@ -144,6 +149,7 @@ def create_deck(cards: list[Card], templates: Templates):
         fields=[
             {"name": "De"},
             {"name": "DeExample"},
+            {"name": "DeSpeak"},
             {"name": "Ru"},
             {"name": "RuExample"},
         ],
@@ -166,7 +172,13 @@ def create_deck(cards: list[Card], templates: Templates):
     for card in cards:
         note = GermanNote(
             model=model,
-            fields=[replace_article(card.de), card.beispiel, card.ru, card.example_ru],
+            fields=[
+                expand_article(card.de),
+                card.beispiel,
+                card.de_speak,
+                card.ru,
+                card.example_ru,
+            ],
         )
         note.card = card
         deck.add_note(note)
