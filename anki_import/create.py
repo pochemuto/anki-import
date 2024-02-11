@@ -36,7 +36,7 @@ def collapse_article(string):
         lambda match: (
             "r "
             if match.group(1) == "der"
-            else "e " if match.group(1) == "die" else "d "
+            else "e " if match.group(1) == "die" else "s "
         ),
         string,
     )
@@ -61,6 +61,13 @@ class Card:
     def de_speak(self) -> str:
         return expand_article(remove_plurals(self.de))
 
+    @property
+    def tags(self) -> list[str]:
+        if not self.type:
+            return []
+        if len(self.type) <= 2:
+            return []
+        return [self.type]
 
 def read_csv() -> list[Card]:
     csv_file_path = "Lernwortschatz.csv"
@@ -191,7 +198,7 @@ def create_deck(cards: list[Card], templates: Templates):
     for card in cards:
         note = GermanNote(
             model=model,
-            tags=[card.type],
+            tags=card.tags,
             fields=[
                 collapse_article(card.de),
                 card.beispiel,
