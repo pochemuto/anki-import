@@ -7,6 +7,7 @@
         min-height: 250px;
         min-width: 200px;
         margin-bottom: 10px;
+        /* zoom: 0.5; */
     }
 
     .template::before {
@@ -53,12 +54,23 @@
     .example {
         font-size: 15px;
         margin-top: 10px;
+    }
+
+    .from .example {
         color: rgb(230, 230, 230);
+    }
+
+    #answer .example {
+        color: rgb(202, 202, 202);
     }
 
     .tts {
         display: inline;
         position: absolute;
+    }
+
+    .android .tts {
+        display: none;
     }
 
     .replay-button:after {
@@ -82,7 +94,9 @@
     <div class="answer card">
         <div class="from answered">{{De}}<div class="example">{{DeExample}}</div>
         </div>
-        <div id="answer">{{Ru}}</div>
+        <div id="answer">{{Ru}}
+            <div class="example">{{RuExample}}</div>
+        </div>
     </div>
 </div>
 

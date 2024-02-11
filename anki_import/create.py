@@ -14,6 +14,10 @@ article_template = re.compile(r"^(der|die|das|[esr]) ")
 plurals = re.compile(r",\s+.*$")
 
 
+def remove_plurals(string: str) -> str:
+    return re.sub(plurals, "", string)
+
+
 def expand_article(string):
     pattern = re.compile(r"^(r|e|s)\s")
     return pattern.sub(
@@ -26,23 +30,36 @@ def expand_article(string):
     )
 
 
+def collapse_article(string):
+    pattern = re.compile(r"^(der|die|das)\s")
+    return pattern.sub(
+        lambda match: (
+            "r "
+            if match.group(1) == "der"
+            else "e " if match.group(1) == "die" else "d "
+        ),
+        string,
+    )
+
+
 @dataclass
 class Card:
     ru: str
     de: str
     beispiel: str
     example_ru: str
+    type: str
 
     @property
     def uuid(self) -> str:
         uuid = self.de
         uuid = re.sub(article_template, "", uuid)
-        uuid = re.sub(plurals, "", uuid)
+        uuid = remove_plurals(uuid)
         return uuid
 
     @property
     def de_speak(self) -> str:
-        return expand_article(re.sub(plurals, "", self.de))
+        return expand_article(remove_plurals(self.de))
 
 
 def read_csv() -> list[Card]:
@@ -57,6 +74,7 @@ def read_csv() -> list[Card]:
                 ru=row["RU"],
                 beispiel=row["Beispiel"],
                 example_ru=row["Example"],
+                type=row["Type"],
             )
             data_list.append(data_obj)
 
@@ -84,6 +102,7 @@ def read_spreadsheet() -> list[Card]:
             ru=row["RU"],
             beispiel=row["Beispiel"],
             example_ru=row["Example"],
+            type=row["Type"]
         )
         data_list.append(data_obj)
     return data_list
@@ -172,8 +191,9 @@ def create_deck(cards: list[Card], templates: Templates):
     for card in cards:
         note = GermanNote(
             model=model,
+            tags=[card.type],
             fields=[
-                expand_article(card.de),
+                collapse_article(card.de),
                 card.beispiel,
                 card.de_speak,
                 card.ru,
