@@ -18,7 +18,7 @@ def remove_plurals(string: str) -> str:
     return re.sub(plurals, "", string)
 
 
-def expand_article(string):
+def expand_article(string: str) -> str:
     pattern = re.compile(r"^(r|e|s)\s")
     return pattern.sub(
         lambda match: (
@@ -30,7 +30,7 @@ def expand_article(string):
     )
 
 
-def collapse_article(string):
+def collapse_article(string: str) -> str:
     pattern = re.compile(r"^(der|die|das)\s")
     return pattern.sub(
         lambda match: (
