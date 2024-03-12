@@ -49,6 +49,7 @@ class Card:
     beispiel: str
     example_ru: str
     type: str
+    page: int
 
     @property
     def uuid(self) -> str:
@@ -69,6 +70,7 @@ class Card:
             return []
         return [self.type]
 
+
 def read_csv() -> list[Card]:
     csv_file_path = "Lernwortschatz.csv"
     data_list = []
@@ -82,6 +84,7 @@ def read_csv() -> list[Card]:
                 beispiel=row["Beispiel"],
                 example_ru=row["Example"],
                 type=row["Type"],
+                page=int(row["Page"]),
             )
             data_list.append(data_obj)
 
@@ -103,13 +106,20 @@ def read_spreadsheet() -> list[Card]:
     data_list = []
     records = worksheet.get_all_records()
     logger.info("Read {} records, last: {}", len(records), records[-1])
+
+    current_page = 0
     for row in records:
+        if "Немецкое" in row["DE"] or len(row["DE"].strip()) == 0:
+            logger.info("Row {} skipped", row)
+            continue
+        current_page = int(row["Page"]) if row["Page"] else current_page
         data_obj = Card(
             de=row["DE"],
             ru=row["RU"],
             beispiel=row["Beispiel"],
             example_ru=row["Example"],
-            type=row["Type"]
+            type=row["Type"],
+            page=current_page,
         )
         data_list.append(data_obj)
     return data_list
@@ -178,6 +188,7 @@ def create_deck(cards: list[Card], templates: Templates):
             {"name": "DeSpeak"},
             {"name": "Ru"},
             {"name": "RuExample"},
+            {"name": "page"},
         ],
         css=templates.css,
         templates=[
@@ -205,6 +216,7 @@ def create_deck(cards: list[Card], templates: Templates):
                 card.de_speak,
                 card.ru,
                 card.example_ru,
+                str(card.page),
             ],
         )
         note.card = card
