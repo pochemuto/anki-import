@@ -108,9 +108,11 @@ def read_spreadsheet() -> list[Card]:
     logger.info("Read {} records, last: {}", len(records), records[-1])
 
     current_page = 0
+    rows_skipped = 0
     for row in records:
         if "Немецкое" in row["DE"] or len(row["DE"].strip()) == 0:
-            logger.info("Row {} skipped", row)
+            logger.trace("Row {} skipped", row)
+            rows_skipped += 1
             continue
         current_page = int(row["Page"]) if row["Page"] else current_page
         data_obj = Card(
@@ -122,6 +124,7 @@ def read_spreadsheet() -> list[Card]:
             page=current_page,
         )
         data_list.append(data_obj)
+    logger.info(f"{rows_skipped} rows skipped")
     return data_list
 
 
