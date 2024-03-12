@@ -64,11 +64,12 @@ class Card:
 
     @property
     def tags(self) -> list[str]:
-        if not self.type:
-            return []
-        if len(self.type) <= 2:
-            return []
-        return [self.type]
+        tags = []
+        if self.type and len(self.type) > 2:
+            tags.append(self.type)
+        if self.page:
+            tags.append(f"page-{self.page:02}")
+        return tags
 
 
 def read_csv() -> list[Card]:
