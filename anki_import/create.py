@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup, element
 from dataclasses import dataclass
 from loguru import logger
-from pprint import pprint
 from typing import cast
 import csv
 import genanki
@@ -94,7 +93,8 @@ def read_csv() -> list[Card]:
 
 def read_spreadsheet() -> list[Card]:
     sh_key = "1IMquarJDdEsJUSYFOHIz_xRK4c-OGVR9Geqf5CH4ZjM"
-    logger.info("Reading spreadsheet https://docs.google.com/spreadsheets/d/" + sh_key)
+    logger.info(
+        "Reading spreadsheet https://docs.google.com/spreadsheets/d/" + sh_key)
     auth = os.getenv("GOOGLE_SERVICE_ACCOUNT")
     if auth:
         logger.info("Found auth info in env")
@@ -152,7 +152,8 @@ def parse_template(tag: element.Tag) -> Template:
 
 def read_templates() -> Templates:
     script_path = os.path.abspath(__file__)
-    templates_path = os.path.join(os.path.dirname(script_path), "templates.html")
+    templates_path = os.path.join(
+        os.path.dirname(script_path), "templates.html")
     with open(templates_path, "r", encoding="utf-8") as file:
         html_content = file.read()
     soup = BeautifulSoup(html_content, "html.parser")
